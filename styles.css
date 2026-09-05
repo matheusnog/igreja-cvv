@@ -152,6 +152,11 @@ a {
   object-position: center;
 }
 
+.industrial-hero-image {
+  height: 560px;
+  object-position: center 38%;
+}
+
 .hero-overlay {
   position: absolute;
   inset: 0;
@@ -637,6 +642,11 @@ h2 {
 
   .hero-image {
     max-height: 420px;
+  }
+
+  .industrial-hero-image {
+    height: 420px;
+    object-position: center 34%;
   }
 
   .hero-overlay {
