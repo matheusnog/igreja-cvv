@@ -399,30 +399,6 @@ h2 {
   max-width: none;
 }
 
-.carousel-controls {
-  display: flex;
-  gap: 10px;
-}
-
-.carousel-button {
-  display: grid;
-  width: 46px;
-  height: 46px;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: var(--white);
-  color: var(--green-dark);
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 900;
-  box-shadow: 0 8px 18px rgb(19 32 27 / 8%);
-}
-
-.carousel-button:hover {
-  border-color: var(--gold);
-}
-
 .instagram-feed-wrap {
   width: 100%;
   overflow: hidden;
@@ -433,6 +409,39 @@ h2 {
 
 .instagram-feed-wrap > div {
   width: 100%;
+}
+
+.instagram-feed-wrap .eapp-carousel-navigation,
+.instagram-feed-wrap .eapp-navigation,
+.instagram-feed-wrap .eapp-nav-button,
+.instagram-feed-wrap button[aria-label*="Previous"],
+.instagram-feed-wrap button[aria-label*="Next"],
+.instagram-feed-wrap .carousel-navigation,
+.instagram-feed-wrap .eapp-slider-button {
+  opacity: 1;
+  filter: none;
+}
+
+.instagram-feed-wrap .eapp-carousel-navigation button,
+.instagram-feed-wrap .eapp-nav-button,
+.instagram-feed-wrap .carousel-navigation button,
+.instagram-feed-wrap button[aria-label*="Previous"],
+.instagram-feed-wrap button[aria-label*="Next"],
+.instagram-feed-wrap .eapp-slider-button {
+  border: 1px solid rgb(19 32 27 / 20%);
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 8px 20px rgb(19 32 27 / 14%);
+  color: var(--green-dark);
+}
+
+.instagram-feed-wrap .eapp-carousel-navigation button:hover,
+.instagram-feed-wrap .eapp-nav-button:hover,
+.instagram-feed-wrap .carousel-navigation button:hover,
+.instagram-feed-wrap button[aria-label*="Previous"]:hover,
+.instagram-feed-wrap button[aria-label*="Next"]:hover,
+.instagram-feed-wrap .eapp-slider-button:hover {
+  border-color: var(--gold);
+  background: var(--white);
 }
 
 .social-carousel {
