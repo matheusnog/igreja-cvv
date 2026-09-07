@@ -43,6 +43,7 @@ const calendarEvents = {
   ],
   Agosto: [
     { day: 9, label: "Culto de Santa Ceia/Primícias" },
+    { day: 29, label: "Congresso dos Jovens" },
     { day: 30, label: "Congresso dos Jovens" },
   ],
   Setembro: [
@@ -52,11 +53,12 @@ const calendarEvents = {
   ],
   Outubro: [
     { day: 11, label: "Culto de Santa Ceia/Primícias" },
-    { day: 31, label: "Congresso do Louvor" },
+    { day: 31, label: "Festa das crianças (Sede e Congregação - Chácara)" },
   ],
   Novembro: [
     { day: 8, label: "Culto de Santa Ceia/Primícias" },
     { day: 14, label: "Congresso do Louvor" },
+    { day: 15, label: "Congresso do Louvor" },
   ],
   Dezembro: [
     { day: 13, label: "Culto de Santa Ceia/Primícias" },
@@ -64,6 +66,7 @@ const calendarEvents = {
 };
 
 const eventColors = ["#d97706", "#0ea5e9", "#16a34a", "#a855f7", "#ef4444", "#f59e0b", "#ec4899"];
+const eventColor = "#c9983c";
 const currentMonthIndex = new Date().getMonth();
 const calendarBoard = document.querySelector("#calendarBoard");
 
@@ -113,7 +116,7 @@ function renderCalendar() {
       if (matchingEvent) {
         dayCell.classList.add("is-event");
         dayCell.title = matchingEvent.label;
-        dayCell.style.background = `linear-gradient(135deg, ${eventColors[(day + index) % eventColors.length]}, ${eventColors[(day + index + 1) % eventColors.length]})`;
+        dayCell.style.background = eventColor;
       }
 
       if (day === 1 && index === currentMonthIndex) {
