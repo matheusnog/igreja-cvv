@@ -47,6 +47,7 @@ const calendarEvents = {
     { day: 30, label: "Congresso dos Jovens" },
   ],
   Setembro: [
+    { day: 12, label: "Aniversário da Congregação" },
     { day: 13, label: "Culto de Santa Ceia/Primícias" },
     { day: 19, label: "Congresso das Mulheres" },
     { day: 20, label: "Congresso das Mulheres" },
