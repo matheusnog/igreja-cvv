@@ -78,7 +78,7 @@
         <a href="#cultos">Cultos</a>
         <a href="#sobre">Sobre</a>
         <a href="#posts">Posts</a>
-        <a href="https://www.bibliaonline.com.br/" target="_blank" rel="noopener noreferrer">Bíblia online</a>
+        <a href="#biblia">Bíblia online</a>
         <a href="#contato">Contato</a>
       </nav>
     </header>
@@ -137,6 +137,49 @@
               Igreja sede
             </a>
           </div>
+        </div>
+      </section>
+
+      <section id="biblia" class="section bible-section">
+        <div class="section-heading bible-heading">
+          <p class="eyebrow">Palavra viva</p>
+          <h2>Leia a Bíblia</h2>
+          <p>Escolha um livro e capítulo para acompanhar a leitura.</p>
+        </div>
+
+        <div class="bible-reader" data-bible-reader>
+          <form class="bible-controls" data-bible-form>
+            <label>
+              Livro
+              <select data-bible-book required disabled></select>
+            </label>
+            <label>
+              Capítulo
+              <select data-bible-chapter required disabled></select>
+            </label>
+            <button class="button button-primary" type="submit" data-bible-submit disabled>
+              Abrir capítulo
+            </button>
+          </form>
+
+          <div class="bible-navigation">
+            <button class="bible-nav-button" type="button" data-bible-previous disabled>
+              &larr; Anterior
+            </button>
+            <strong data-bible-reference aria-live="polite">Preparando a leitura</strong>
+            <button class="bible-nav-button" type="button" data-bible-next disabled>
+              Próximo &rarr;
+            </button>
+          </div>
+
+          <p class="bible-status" data-bible-status role="status" aria-live="polite">
+            Carregando livros da Bíblia...
+          </p>
+          <div class="bible-verses" data-bible-verses></div>
+          <p class="bible-credit">
+            João Ferreira de Almeida, domínio público. Dados fornecidos pela
+            <a href="https://bible-api.com/" target="_blank" rel="noopener noreferrer">Bible API</a>.
+          </p>
         </div>
       </section>
 

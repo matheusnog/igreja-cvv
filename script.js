@@ -162,6 +162,202 @@ function moveCarousel(direction) {
 previousButton?.addEventListener("click", () => moveCarousel(-1));
 nextButton?.addEventListener("click", () => moveCarousel(1));
 
+const bibleApiUrl = "https://bible-api.com";
+const bibleStorageKey = "igreja-cvv-bible-reading";
+
+async function fetchBibleData(path) {
+  const response = await fetch(`${bibleApiUrl}${path}`);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Não foi possível carregar os dados da Bíblia.");
+  }
+
+  return data;
+}
+
+function initializeBibleReader() {
+  const reader = document.querySelector("[data-bible-reader]");
+  if (!reader) return;
+
+  const form = reader.querySelector("[data-bible-form]");
+  const bookSelect = reader.querySelector("[data-bible-book]");
+  const chapterSelect = reader.querySelector("[data-bible-chapter]");
+  const submitButton = reader.querySelector("[data-bible-submit]");
+  const previousChapterButton = reader.querySelector("[data-bible-previous]");
+  const nextChapterButton = reader.querySelector("[data-bible-next]");
+  const reference = reader.querySelector("[data-bible-reference]");
+  const status = reader.querySelector("[data-bible-status]");
+  const versesContainer = reader.querySelector("[data-bible-verses]");
+  const chapterCache = new Map();
+  let requestNumber = 0;
+  let bookRequestNumber = 0;
+
+  function setStatus(message, isError = false) {
+    status.textContent = message;
+    status.classList.toggle("is-error", isError);
+  }
+
+  function updateNavigation() {
+    const chapterNumber = Number(chapterSelect.value);
+    const lastChapter = chapterSelect.options.length;
+    const isLoading = submitButton.disabled;
+
+    previousChapterButton.disabled = isLoading || chapterNumber <= 1;
+    nextChapterButton.disabled = isLoading || chapterNumber >= lastChapter;
+  }
+
+  async function loadBookChapters(bookId, preferredChapter = 1) {
+    const activeBookRequest = ++bookRequestNumber;
+    chapterSelect.disabled = true;
+    submitButton.disabled = true;
+    reference.textContent = "";
+    versesContainer.replaceChildren();
+    updateNavigation();
+    setStatus("Carregando capítulos...");
+
+    try {
+      let bookData = chapterCache.get(bookId);
+      if (!bookData) {
+        bookData = await fetchBibleData(`/data/almeida/${encodeURIComponent(bookId)}`);
+        chapterCache.set(bookId, bookData);
+      }
+
+      if (activeBookRequest !== bookRequestNumber) return;
+
+      chapterSelect.replaceChildren(
+        ...bookData.chapters.map((chapter) => {
+          const option = document.createElement("option");
+          option.value = chapter.chapter;
+          option.textContent = chapter.chapter;
+          return option;
+        }),
+      );
+
+      const availableChapter = bookData.chapters.some(
+        (chapter) => chapter.chapter === preferredChapter,
+      )
+        ? preferredChapter
+        : 1;
+      chapterSelect.value = availableChapter;
+      chapterSelect.disabled = false;
+      submitButton.disabled = false;
+      setStatus("Selecione um capítulo para começar a leitura.");
+      updateNavigation();
+    } catch {
+      if (activeBookRequest !== bookRequestNumber) return;
+      setStatus("Não foi possível carregar os capítulos. Verifique sua conexão e tente novamente.", true);
+      updateNavigation();
+    }
+  }
+
+  async function loadChapter() {
+    const selectedBook = bookSelect.selectedOptions[0];
+    const bookId = bookSelect.value;
+    const chapterNumber = Number(chapterSelect.value);
+    if (!selectedBook || !bookId || !chapterNumber) return;
+
+    const activeRequest = ++requestNumber;
+    bookSelect.disabled = true;
+    chapterSelect.disabled = true;
+    submitButton.disabled = true;
+    updateNavigation();
+    versesContainer.replaceChildren();
+    setStatus("Carregando capítulo...");
+
+    try {
+      const chapter = await fetchBibleData(
+        `/${encodeURIComponent(`${bookId} ${chapterNumber}`)}?translation=almeida`,
+      );
+
+      if (activeRequest !== requestNumber) return;
+
+      reference.textContent = chapter.reference;
+      chapter.verses.forEach((verse) => {
+        const paragraph = document.createElement("p");
+        paragraph.className = "bible-verse";
+
+        const number = document.createElement("span");
+        number.className = "bible-verse-number";
+        number.textContent = verse.verse;
+
+        paragraph.append(number, document.createTextNode(verse.text.trim()));
+        versesContainer.appendChild(paragraph);
+      });
+
+      setStatus("");
+      try {
+        localStorage.setItem(
+          bibleStorageKey,
+          JSON.stringify({ bookId, chapter: chapterNumber }),
+        );
+      } catch {}
+    } catch {
+      if (activeRequest !== requestNumber) return;
+      reference.textContent = "";
+      setStatus("Não foi possível carregar este capítulo. Verifique sua conexão e tente novamente.", true);
+    } finally {
+      if (activeRequest === requestNumber) {
+        bookSelect.disabled = false;
+        chapterSelect.disabled = false;
+        submitButton.disabled = false;
+        updateNavigation();
+      }
+    }
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    loadChapter();
+  });
+
+  bookSelect.addEventListener("change", () => {
+    loadBookChapters(bookSelect.value);
+  });
+
+  previousChapterButton.addEventListener("click", () => {
+    chapterSelect.value = Number(chapterSelect.value) - 1;
+    loadChapter();
+  });
+
+  nextChapterButton.addEventListener("click", () => {
+    chapterSelect.value = Number(chapterSelect.value) + 1;
+    loadChapter();
+  });
+
+  async function loadCatalog() {
+    try {
+      const catalog = await fetchBibleData("/data/almeida");
+      catalog.books.forEach((book) => {
+        const option = document.createElement("option");
+        option.value = book.id;
+        option.textContent = book.name;
+        bookSelect.appendChild(option);
+      });
+
+      let savedReading = null;
+      try {
+        savedReading = JSON.parse(localStorage.getItem(bibleStorageKey));
+      } catch {
+        savedReading = null;
+      }
+
+      const initialBook = catalog.books.find((book) => book.id === savedReading?.bookId)
+        || catalog.books[0];
+      bookSelect.value = initialBook.id;
+      bookSelect.disabled = false;
+      await loadBookChapters(initialBook.id, savedReading?.chapter || 1);
+      await loadChapter();
+    } catch {
+      setStatus("Não foi possível carregar a Bíblia. Verifique sua conexão e atualize a página.", true);
+    }
+  }
+
+  loadCatalog();
+}
+
+initializeBibleReader();
+
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", renderCalendar, { once: true });
 } else {
